@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Елизавета & Максим — Фотоохота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --bg: #F4EFE7;
+    --bg-card: #FBF8F2;
+    --ink: #1F1A14;
+    --ink-soft: #5C5448;
+    --ink-mute: #8A8170;
+    --line: #D9CFBE;
+    --line-soft: #E8E0CF;
+    --accent: #A8553A;
+    --accent-soft: #C77556;
+    --accent-bg: #EFDDD3;
+    --success: #5C7A4F;
+    --success-bg: #DCE5D2;
+    --radius: 4px;
+    --radius-lg: 6px;
+    --serif: 'Fraunces', 'Times New Roman', serif;
+    --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  .nav {
+    background: rgba(244, 239, 231, 0.92);
+    backdrop-filter: saturate(180%) blur(10px);
+    -webkit-backdrop-filter: saturate(180%) blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding: 0 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .nav-logo {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    font-style: italic;
+  }
+  .nav-logo .amp {
+    color: var(--accent);
+    font-style: italic;
+    margin: 0 4px;
+  }
+  .nav-tabs { display: flex; gap: 2px; }
+  .nav-tab {
+    padding: 8px 16px;
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--ink-mute);
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-tab.active { color: var(--ink); }
+  .nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 16px;
+    right: 16px;
+    height: 1px;
+    background: var(--accent);
+  }
+  .nav-tab:hover:not(.active) { color: var(--ink); }
+
+  /* PAGES */
+  .page { display: none; padding: 4rem 2.5rem 5rem; max-width: 920px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* HERO */
+  .hero {
+    text-align: center;
+    padding: 1rem 1rem 3.5rem;
+  }
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+  }
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: clamp(40px, 7vw, 64px);
+    font-weight: 300;
+    line-height: 1;
+    color: var(--ink);
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 .amp {
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+  .hero-date {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 0.5rem;
+    font-weight: 300;
+  }
+  .hero p {
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 400;
+  }
+
+  /* DIVIDER */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 2.5rem 0 2rem;
+  }
+  .divider-line { flex: 1; height: 1px; background: var(--line); }
+  .divider-text {
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  /* GUESTS GRID */
+  .guests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1px;
+    background: var(--line-soft);
+    border: 1px solid var(--line-soft);
+  }
+  .guest-card {
+    background: var(--bg-card);
+    padding: 2rem 1.25rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+  }
+  .guest-card:hover { background: #fff; }
+  .guest-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 400;
+    color: #fff;
+    overflow: hidden;
+    letter-spacing: 0.02em;
+  }
+  .guest-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .guest-name {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.005em;
+  }
+  .guest-progress {
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.875rem;
+  }
+  .progress-bar-wrap {
+    height: 1px;
+    background: var(--line);
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.5s ease;
+  }
+
+  /* PERSONAL PAGE */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    cursor: pointer;
+    border: none;
+    background: none;
+    margin-bottom: 2.5rem;
+    padding: 0;
+    font-weight: 500;
+    font-family: var(--sans);
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--accent); }
+
+  .guest-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0 0 2rem;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 2rem;
+  }
+  .guest-header-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 24px;
+    color: #fff;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .guest-header-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .guest-header-info h2 {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 4px;
+    letter-spacing: -0.005em;
+  }
+  .guest-header-info p {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* TASKS */
+  .tasks-list { display: flex; flex-direction: column; gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); }
+  .task-card {
+    background: var(--bg-card);
+    transition: background 0.2s;
+  }
+  .task-card.done { background: #fff; }
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem 1.75rem;
+  }
+  .task-num {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-mute);
+    flex-shrink: 0;
+    min-width: 20px;
+    font-weight: 400;
+  }
+  .task-card.done .task-num { color: var(--success); }
+  .task-title {
+    font-family: var(--serif);
+    font-size: 19px;
+    font-weight: 400;
+    color: var(--ink);
+    flex: 1;
+    letter-spacing: -0.005em;
+  }
+  .task-badge {
+    font-size: 9px;
+    padding: 5px 10px;
+    border-radius: 2px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+  .badge-done { background: var(--success-bg); color: var(--success); }
+  .badge-pending { background: var(--accent-bg); color: var(--accent); }
+
+  .task-body {
+    padding: 0 1.75rem 1.75rem;
+  }
+  .task-desc {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin-bottom: 1.25rem;
+    line-height: 1.65;
+    max-width: 56ch;
+  }
+
+  .task-photo-done {
+    overflow: hidden;
+    position: relative;
+    max-width: 320px;
+  }
+  .task-photo-done img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    display: block;
+  }
+  .task-photo-done .photo-check {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--success);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .upload-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px dashed var(--line);
+    background: var(--bg);
+    padding: 2.5rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    min-height: 160px;
+  }
+  .upload-area:hover {
+    border-color: var(--accent);
+    background: var(--bg-card);
+  }
+  .upload-area.uploading { opacity: 0.5; pointer-events: none; }
+  .upload-area input[type=file] {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 1;
+  }
+  .upload-icon-wrap {
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    color: var(--accent);
+    font-size: 16px;
+  }
+  .upload-text {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .upload-hint {
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  /* GALLERY */
+  .gallery-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 3rem;
+  }
+  .stat-card {
+    padding: 1.5rem 1rem;
+    text-align: center;
+    border-right: 1px solid var(--line);
+  }
+  .stat-card:last-child { border-right: none; }
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--ink);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 10px;
+    color: var(--ink-mute);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .gallery-item {
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    aspect-ratio: 4 / 5;
+    background: var(--line-soft);
+  }
+  .gallery-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .gallery-item:hover img { transform: scale(1.04); }
+  .gallery-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(transparent, rgba(31,26,20,0.75));
+    padding: 28px 12px 10px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .gallery-item:hover .gallery-overlay { opacity: 1; }
+  .gallery-overlay .author {
+    font-family: var(--serif);
+    font-size: 13px;
+    font-style: italic;
+  }
+  .gallery-overlay .task-name {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  .empty-gallery {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--ink-mute);
+  }
+  .empty-gallery .icon {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 56px;
+    color: var(--line);
+    margin-bottom: 1rem;
+    font-weight: 300;
+  }
+  .empty-gallery p {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.8;
+  }
+
+  .loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--ink-mute);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 14px;
+  }
+
+  /* LIGHTBOX */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 16, 12, 0.94);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: fadeIn 0.25s ease;
+  }
+  .lightbox.active { display: flex; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .lightbox-img-wrap {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .lightbox img {
+    max-width: 90vw;
+    max-height: 78vh;
+    display: block;
+  }
+  .lightbox-caption {
+    color: #F4EFE7;
+    text-align: center;
+  }
+  .lightbox-caption .author {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 16px;
+    color: #fff;
+  }
+  .lightbox-caption .task-name {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-top: 4px;
+  }
+  .lightbox-btn {
+    position: absolute;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-family: var(--serif);
+  }
+  .lightbox-btn:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.5);
+  }
+  .lightbox-close { top: 24px; right: 24px; }
+  .lightbox-prev { left: 24px; top: 50%; transform: translateY(-50%); }
+  .lightbox-next { right: 24px; top: 50%; transform: translateY(-50%); }
+  .lightbox-counter {
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.6);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+  }
+
+  /* MOBILE */
+  @media (max-width: 720px) {
+    .nav {
+      padding: 0 1.25rem;
+      height: 56px;
+    }
+    .nav-logo { font-size: 15px; }
+    .nav-tab {
+      padding: 6px 10px;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+    }
+    .nav-tab.active::after { left: 10px; right: 10px; }
+
+    .page { padding: 2rem 1.25rem 3rem; }
+
+    .hero { padding: 0.5rem 0 2rem; }
+    .hero-eyebrow { font-size: 9px; margin-bottom: 1rem; }
+    .hero-date { font-size: 14px; }
+    .hero p { font-size: 10px; }
+
+    .divider { margin: 1.75rem 0 1.25rem; }
+    .divider-text { font-size: 9px; }
+
+    .guests-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .guest-card { padding: 1.5rem 0.75rem 1.25rem; }
+    .guest-avatar {
+      width: 60px;
+      height: 60px;
+      font-size: 19px;
+      margin-bottom: 0.75rem;
+    }
+    .guest-name { font-size: 15px; }
+    .guest-progress { font-size: 9px; }
+
+    .back-btn { margin-bottom: 1.5rem; font-size: 10px; }
+
+    .guest-header {
+      padding-bottom: 1.5rem;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+    }
+    .guest-header-avatar { width: 56px; height: 56px; font-size: 20px; }
+    .guest-header-info h2 { font-size: 22px; }
+    .guest-header-info p { font-size: 10px; }
+
+    .task-header { padding: 1.25rem 1.25rem; gap: 0.75rem; }
+    .task-title { font-size: 16px; }
+    .task-badge { font-size: 8px; padding: 4px 8px; }
+    .task-body { padding: 0 1.25rem 1.25rem; }
+    .task-desc { font-size: 13px; margin-bottom: 1rem; }
+
+    .task-photo-done { max-width: 100%; }
+
+    .upload-area { padding: 2rem 1rem; min-height: 140px; }
+    .upload-icon-wrap { width: 32px; height: 32px; font-size: 14px; }
+    .upload-text { font-size: 14px; }
+    .upload-hint { font-size: 9px; }
+
+    .gallery-stats { margin-bottom: 2rem; }
+    .stat-card { padding: 1.125rem 0.5rem; }
+    .stat-num { font-size: 28px; }
+    .stat-label { font-size: 9px; letter-spacing: 0.12em; }
+
+    .gallery-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .lightbox { padding: 1rem; }
+    .lightbox img { max-width: 95vw; max-height: 75vh; }
+    .lightbox-prev { left: 12px; width: 38px; height: 38px; }
+    .lightbox-next { right: 12px; width: 38px; height: 38px; }
+    .lightbox-close { top: 16px; right: 16px; width: 38px; height: 38px; }
+    .lightbox-counter { top: 24px; font-size: 12px; }
+  }
+
+  @media (max-width: 380px) {
+    .guests-grid { grid-template-columns: 1fr; }
+    .nav-logo { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">Елизавета<span class="amp">&</span>Максим</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('guests')">Гости</button>
+    <button class="nav-tab" onclick="showPage('gallery')">Галерея</button>
+  </div>
+</nav>
+
+<!-- PAGE: GUESTS -->
+<div class="page active" id="page-guests">
+  <div class="hero">
+    <div class="hero-eyebrow">Свадебная фотоохота</div>
+    <h1>Елизавета <span class="amp">&</span> Максим</h1>
+    <div class="hero-date">27 июня 2026</div>
+    <p>Найди себя и выполни задания</p>
+  </div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-text">Гости</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="guests-grid" id="guests-grid">
+    <div class="loading">Загружаем гостей…</div>
+  </div>
+</div>
+
+<!-- PAGE: PERSONAL -->
+<div class="page" id="page-personal">
+  <button class="back-btn" onclick="showPage('guests')">← К списку гостей</button>
+  <div class="guest-header" id="personal-header"></div>
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-text">Задания</div>
+    <div class="divider-line"></div>
+  </div>
+  <div class="tasks-list" id="tasks-list"></div>
+</div>
+
+<!-- PAGE: GALLERY -->
+<div class="page" id="page-gallery">
+  <div class="hero">
+    <div class="hero-eyebrow">Альбом дня</div>
+    <h1>Галерея</h1>
+    <div class="hero-date">все моменты вместе</div>
+  </div>
+
+  <div class="gallery-stats">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-photos">0</div>
+      <div class="stat-label">фотографий</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-guests">0</div>
+      <div class="stat-label">участников</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-tasks">0</div>
+      <div class="stat-label">заданий</div>
+    </div>
+  </div>
+
+  <div class="gallery-grid" id="gallery-grid">
+    <div class="empty-gallery">
+      <div class="icon">∅</div>
+      <p>Пока ни одного снимка</p>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-counter" id="lightbox-counter"></div>
+  <button class="lightbox-btn lightbox-close" onclick="closeLightbox(event, true)">×</button>
+  <button class="lightbox-btn lightbox-prev" onclick="navLightbox(event, -1)">‹</button>
+  <button class="lightbox-btn lightbox-next" onclick="navLightbox(event, 1)">›</button>
+  <div class="lightbox-img-wrap" onclick="event.stopPropagation()">
+    <img id="lightbox-img" src="" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+</div>
+
+<script>
+// === Supabase ===
+const SUPABASE_URL = 'https://shimat4l.beget.tech/proxy';
+
+// Перехватываем запросы и заворачиваем через api.php
+const originalFetch = window.fetch;
+window.fetch = function(input, init) {
+  if (typeof input === 'string' && input.startsWith('https://shimat4l.beget.tech/')) {
+    const path = input.replace('https://shimat4l.beget.tech/', '');
+    const [pathPart, queryPart] = path.split('?');
+    const newUrl = 'https://shimat4l.beget.tech/api.php?p=' + encodeURIComponent(pathPart) + (queryPart ? '&' + queryPart : '');
+    return originalFetch(newUrl, init);
+  }
+  return originalFetch(input, init);
+};
+
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx2Y2tpY3h3amRmYXZmc2RodG1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzOTI5NTcsImV4cCI6MjA5Nzk2ODk1N30.-KvgscYgkhN7sV9gJXzYwon3nnHorcCSEAMoMSQ6yd4';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const BUCKET = 'photos';
+
+const COLORS = ['#A8553A','#7A8A6F','#9C7B5C','#B89178','#6F7F8A','#A87B7B','#8C6B5C','#6B7A6F'];
+
+let guests = [];
+let tasks = [];
+const uploads = {}; // { guestId: { taskId: { full, thumb } } }
+let galleryItems = [];
+let lightboxIndex = 0;
+
+function initials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function getProgress(guestId) {
+  const done = uploads[guestId] ? Object.keys(uploads[guestId]).length : 0;
+  return { done, total: tasks.length };
+}
+
+function avatarHTML(g) {
+  if (g.avatar_url) return `<img src="${g.avatar_url}" alt="${g.name}">`;
+  return initials(g.name);
+}
+
+// Получить URL для миниатюры/полноразмерного с учётом старых записей
+function getThumb(data) {
+  if (!data) return '';
+  return typeof data === 'string' ? data : (data.thumb || data.full);
+}
+function getFull(data) {
+  if (!data) return '';
+  return typeof data === 'string' ? data : (data.full || data.thumb);
+}
+
+function renderGuests() {
+  const grid = document.getElementById('guests-grid');
+  if (guests.length === 0) {
+    grid.innerHTML = `<div class="loading">Список гостей пока пуст</div>`;
+    return;
+  }
+  grid.innerHTML = guests.map(g => {
+    const { done, total } = getProgress(g.id);
+    const pct = total ? Math.round(done / total * 100) : 0;
+    return `
+      <div class="guest-card" onclick="openGuest('${g.id}')">
+        <div class="guest-avatar" style="background:${g.color}">${avatarHTML(g)}</div>
+        <div class="guest-name">${g.name}</div>
+        <div class="guest-progress">${done} / ${total}</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" style="width:${pct}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function openGuest(guestId) {
+  const g = guests.find(x => x.id === guestId);
+  if (!g) return;
+  const { done, total } = getProgress(guestId);
+
+  document.getElementById('personal-header').innerHTML = `
+    <div class="guest-header-avatar" style="background:${g.color}">${avatarHTML(g)}</div>
+    <div class="guest-header-info">
+      <h2>${g.name}</h2>
+      <p>${done} из ${total} заданий выполнено</p>
+    </div>`;
+
+  const list = document.getElementById('tasks-list');
+  if (tasks.length === 0) {
+    list.innerHTML = `<div class="loading">Задания скоро появятся</div>`;
+  } else {
+    list.innerHTML = tasks.map((t, i) => {
+      const photoData = uploads[guestId]?.[t.id];
+      const isDone = !!photoData;
+      const num = String(i + 1).padStart(2, '0');
+      return `
+        <div class="task-card ${isDone ? 'done' : ''}" id="task-${guestId}-${t.id}">
+          <div class="task-header">
+            <div class="task-num">${num}</div>
+            <div class="task-title">${t.title}</div>
+            <span class="task-badge ${isDone ? 'badge-done' : 'badge-pending'}">${isDone ? 'Готово' : 'В ожидании'}</span>
+          </div>
+          <div class="task-body">
+            ${t.description ? `<div class="task-desc">${t.description}</div>` : ''}
+            ${isDone
+              ? `<div class="task-photo-done">
+                  <img src="${getThumb(photoData)}" alt="Фото задания">
+                  <div class="photo-check">✓</div>
+                 </div>`
+              : `<label class="upload-area" id="upload-${guestId}-${t.id}">
+                  <input type="file" accept="image/*" onchange="handleUpload('${guestId}','${t.id}',this)">
+                  <div class="upload-icon-wrap">+</div>
+                  <div class="upload-text">Загрузить фото</div>
+                  <div class="upload-hint">JPG, PNG · до 10 МБ</div>
+                 </label>`
+            }
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  showPage('personal');
+  window._currentGuest = guestId;
+}
+
+// === Сжатие ===
+async function compressImage(file, maxSize, quality) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = Math.round(height * maxSize / width);
+            width = maxSize;
+          } else {
+            width = Math.round(width * maxSize / height);
+            height = maxSize;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(blob => {
+          if (!blob) return reject(new Error('Не удалось сжать'));
+          resolve(blob);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function handleUpload(guestId, taskId, input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const area = document.getElementById(`upload-${guestId}-${taskId}`);
+  if (area) {
+    area.classList.add('uploading');
+    area.querySelector('.upload-text').textContent = 'Обрабатываем…';
+  }
+
+  try {
+    // Полноразмерное для лайтбокса (2000px, качество 90%)
+    const fullSize = await compressImage(file, 2000, 0.9);
+    // Превью для сетки (600px, качество 78%)
+    const thumb = await compressImage(file, 600, 0.78);
+
+    if (area) area.querySelector('.upload-text').textContent = 'Загружаем…';
+
+    const ts = Date.now();
+    const fullPath = `${guestId}/${taskId}-${ts}.jpg`;
+    const thumbPath = `${guestId}/${taskId}-${ts}-thumb.jpg`;
+
+    const [fullRes, thumbRes] = await Promise.all([
+      sb.storage.from(BUCKET).upload(fullPath, fullSize, { contentType: 'image/jpeg', cacheControl: '3600' }),
+      sb.storage.from(BUCKET).upload(thumbPath, thumb, { contentType: 'image/jpeg', cacheControl: '3600' }),
+    ]);
+    if (fullRes.error) throw fullRes.error;
+    if (thumbRes.error) throw thumbRes.error;
+
+    const fullUrl = sb.storage.from(BUCKET).getPublicUrl(fullPath).data.publicUrl;
+    const thumbUrl = sb.storage.from(BUCKET).getPublicUrl(thumbPath).data.publicUrl;
+
+    const { error: insErr } = await sb
+      .from('submissions')
+      .insert({ guest_id: guestId, task_id: taskId, photo_url: fullUrl, thumb_url: thumbUrl });
+    if (insErr) throw insErr;
+
+    if (!uploads[guestId]) uploads[guestId] = {};
+    uploads[guestId][taskId] = { full: fullUrl, thumb: thumbUrl };
+
+    openGuest(guestId);
+    updateGallery();
+    renderGuests();
+  } catch (err) {
+    console.error(err);
+    alert('Не удалось загрузить фото: ' + (err.message || err));
+    if (area) {
+      area.classList.remove('uploading');
+      area.querySelector('.upload-text').textContent = 'Загрузить фото';
+    }
+  }
+}
+
+function updateGallery() {
+  const grid = document.getElementById('gallery-grid');
+  galleryItems = [];
+  let activeGuests = new Set();
+
+  guests.forEach(g => {
+    if (!uploads[g.id]) return;
+    activeGuests.add(g.id);
+    Object.entries(uploads[g.id]).forEach(([tid, data]) => {
+      const task = tasks.find(t => t.id === tid);
+      galleryItems.push({
+        full: getFull(data),
+        thumb: getThumb(data),
+        guest: g.name,
+        task: task?.title || ''
+      });
+    });
+  });
+
+  document.getElementById('stat-photos').textContent = galleryItems.length;
+  document.getElementById('stat-guests').textContent = activeGuests.size;
+  document.getElementById('stat-tasks').textContent = galleryItems.length;
+
+  if (galleryItems.length === 0) {
+    grid.innerHTML = `<div class="empty-gallery">
+      <div class="icon">∅</div>
+      <p>Пока ни одного снимка</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = galleryItems.map((item, i) => `
+    <div class="gallery-item" onclick="openLightbox(${i})">
+      <img src="${item.thumb}" alt="${item.task}" loading="lazy">
+      <div class="gallery-overlay">
+        <div class="author">${item.guest}</div>
+        <div class="task-name">${item.task}</div>
+      </div>
+    </div>`).join('');
+}
+
+// LIGHTBOX
+function openLightbox(index) {
+  if (!galleryItems[index]) return;
+  lightboxIndex = index;
+  renderLightbox();
+  document.getElementById('lightbox').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function renderLightbox() {
+  const item = galleryItems[lightboxIndex];
+  document.getElementById('lightbox-img').src = item.full;
+  document.getElementById('lightbox-caption').innerHTML = `
+    <div class="author">${item.guest}</div>
+    <div class="task-name">${item.task}</div>`;
+  document.getElementById('lightbox-counter').textContent = `${lightboxIndex + 1} / ${galleryItems.length}`;
+}
+
+function closeLightbox(event, force) {
+  if (force || event.target.id === 'lightbox') {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+}
+
+function navLightbox(event, dir) {
+  event.stopPropagation();
+  lightboxIndex = (lightboxIndex + dir + galleryItems.length) % galleryItems.length;
+  renderLightbox();
+}
+
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('active')) return;
+  if (e.key === 'Escape') closeLightbox(null, true);
+  if (e.key === 'ArrowLeft') navLightbox(e, -1);
+  if (e.key === 'ArrowRight') navLightbox(e, 1);
+});
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const tabs = document.querySelectorAll('.nav-tab');
+  if (name === 'guests' || name === 'personal') tabs[0].classList.add('active');
+  if (name === 'gallery') tabs[1].classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function loadAll() {
+  try {
+    const [gRes, tRes, sRes] = await Promise.all([
+      sb.from('guests').select('id, name, avatar_url').order('name'),
+      sb.from('tasks').select('id, title, description, order_num').order('order_num'),
+      sb.from('submissions').select('guest_id, task_id, photo_url, thumb_url, created_at').order('created_at'),
+    ]);
+    if (gRes.error) throw gRes.error;
+    if (tRes.error) throw tRes.error;
+    if (sRes.error) throw sRes.error;
+
+    guests = gRes.data.map((g, i) => ({ ...g, color: COLORS[i % COLORS.length] }));
+    tasks = tRes.data;
+
+    sRes.data.forEach(row => {
+      if (!uploads[row.guest_id]) uploads[row.guest_id] = {};
+      uploads[row.guest_id][row.task_id] = {
+        full: row.photo_url,
+        thumb: row.thumb_url || row.photo_url
+      };
+    });
+
+    renderGuests();
+    updateGallery();
+  } catch (err) {
+    console.error(err);
+    document.getElementById('guests-grid').innerHTML =
+      `<div class="loading">Не удалось загрузить данные: ${err.message || err}</div>`;
+  }
+}
+
+// Перезагружаем фото каждые 20 секунд (вместо WebSocket)
+setInterval(async () => {
+  try {
+    const { data } = await sb.from('submissions')
+      .select('guest_id, task_id, photo_url, thumb_url')
+      .order('created_at');
+    if (!data) return;
+    let changed = false;
+    data.forEach(row => {
+      if (!uploads[row.guest_id]) uploads[row.guest_id] = {};
+      const existing = uploads[row.guest_id][row.task_id];
+      const newFull = row.photo_url;
+      if (!existing || existing.full !== newFull) {
+        uploads[row.guest_id][row.task_id] = {
+          full: row.photo_url,
+          thumb: row.thumb_url || row.photo_url
+        };
+        changed = true;
+      }
+    });
+    if (changed) {
+      renderGuests();
+      updateGallery();
+      if (window._currentGuest) openGuest(window._currentGuest);
+    }
+  } catch (e) { console.warn(e); }
+}, 20000);
+
+
+loadAll();
+</script>
+</body>
+</html>
